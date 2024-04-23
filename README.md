@@ -1,4 +1,4 @@
-# data-analysis
+# Data-Analysis
 Contains several projects for Data Analysis...
 
 A data analyst project using Power BI, SQL, CSV files, and ETL involves extracting data from CSV files or other sources, 
