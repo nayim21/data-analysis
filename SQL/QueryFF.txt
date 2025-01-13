@@ -1,0 +1,137 @@
+
+---Create Function
+Create Or Alter Function fn_test3(@a int , @b int, @c int)
+Returns int
+As 
+Begin
+Declare @z int 
+Set @z= (@a+@b+@c)/2
+Return @z
+End
+
+Select dbo.fn_test3(1,2,3)
+
+---Der Table
+Select *
+From (Select Customers.CustomerID , Customers.City , Customers.Country 
+      From Customers
+      Where Customers.Country = N'USA' 
+	  ) as Der1
+
+---Create View Recently Customer
+ Create Or Alter View ViewCustOrder
+ As
+ Select *
+ From Customers  
+ Where Customers.CustomerID In 
+                              (Select CustomerID
+							  From Orders 
+							  Where  Datediff(Day,Orders.OrderDate,Getdate()) < 18000
+							  )
+
+Go
+Select *
+From ViewCustOrder
+
+---Inner Join    
+Select *
+From Customers C Inner join  Orders O
+On C.CustomerID=O.CustomerID
+Where C.Country = N'USA' and Year(O.OrderDate)=1996
+
+---Inner Join
+Select *
+From Customers C Inner Join Orders O
+On c.CustomerID=O.CustomerID
+Where C.Country='Uk' and O.ShipCountry='UK'
+
+--- Compund CTE
+;
+With Cte1 
+          As 
+          (Select * From Products 
+		  where UnitPrice>10)
+,    Cte2  
+         As 
+		 (Select * From Cte1 
+		 Where Unitprice <15 )
+Select *
+From Cte2
+
+---Select Omin Kala
+Create Or Alter Function Fn_OminKala(@Omin Int)
+Returns Table 
+As
+Return (Select Top (@Omin) * 
+From Products
+Order By  UnitPrice Asc)
+Go
+
+Select *
+From Fn_OminKala(8)
+
+---Select Between Two Record
+Create Or Alter Function Fn_OOminkala(@OOmin1 Int,@OOmin2 Int)
+Returns Table
+As
+Return 
+(
+With Cte1 As (
+             Select Top (@OOmin2) * 
+			 From Products
+			 Order By UnitPrice Asc
+			 )
+
+Select top (@OOmin1) *
+From Cte1
+Order by UnitPrice desc
+)
+Select * 
+From Fn_OOminkala(5,8)
+
+
+---Inner Join Functions
+---Inner Join Table 
+---Inner Join Function and Table
+
+Create Or Alter Function Fn_ForCountryYear(@Year Int , @Country Nvarchar(15))
+Returns Table
+As
+Return 
+(
+Select Country,OrderDate ,Customers.City,Orders.OrderID
+From Customers  Inner Join  Orders 
+ON Customers.CustomerID=Orders.CustomerID
+Where Year(Orders.OrderDate)=@Year and Customers.Country=@Country
+)
+Select *
+From Fn_ForCountryYear(1996,'USA')
+
+Create Or Alter Function Fn_GetOrderCountry(@country1 Nvarchar(15))
+Returns Table
+As
+Return 
+(
+Select * 
+From Customers
+Where Country=@country1
+)
+Create Or Alter Function Fn_GetOrderByYear(@Year1 Int)
+Returns Table
+As
+Return
+(
+Select *
+From Orders
+Where Year(OrderDate)=@Year1
+)
+
+Select * 
+From Customers
+Cross Apply Fn_GetOrderByYear(1997)
+Where Customers.Country='USA'
+
+Select * 
+From Orders
+Cross Apply Fn_GetOrderCountry('USA')
+Where Year(Orders.OrderDate)=1997

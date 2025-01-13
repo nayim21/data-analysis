@@ -1,0 +1,73 @@
+﻿---Category For Price 
+Use Northwind
+Go
+Select ProductID,ProductName,Unitprice,
+Case 
+When unitprice<10 then 'Low Price'
+When Unitprice between 10 and 50 then 'Moderate Price'
+When Unitprice > 50 then 'Expensive Price'
+End as CategoryPrice
+From Products
+
+---Persian column
+Select ProductID,ProductName,Discontinued,
+IIF(Discontinued=0,N'ندارد',N'دارد') as takhfif
+From Products
+
+---Use distinct
+Select Distinct country
+From Customers
+
+---Category By Continent
+Select CustomerID,City,Country ,
+                   Case
+                   When  Country = 'Denmark' or Country = 'Finland' or Country= 'France' or Country= 'Germany' or Country= 'Irland' 
+				   or Country= 'Italy' or Country= 'Norway' or Country= 'Poland'  or Country= 'Portugal' or Country= 'Spain' or Country= 'Sweden'
+				   or Country= 'Switzerland' or Country='Uk'or Country='Belgium' Or Country='Ireland'
+				   Then N'Europe'
+				   When  Country = 'Usa' or Country ='Venezuela' or Country= 'Mexico' or Country= 'Argentina' or Country= 'Brazil'
+				   or Country='Canada'
+				   Then N'America'
+				   When Country='Austria'
+				   Then N'Austria'
+				   End  As Continent
+From  Customers
+
+---Calculated Column
+Alter table employees
+add  AgeEmp int 
+
+Update Employees
+Set AgeEmp = DATEDIFF(year , birthdate,getdate())
+
+select EmployeeID,LastName,FirstName,AgeEmp,
+                                     Case
+                                     When  AgeEmp<40  Then N'Younge'
+									 When  AgeEmp between 40 and 65   Then N'Moderate'
+								     When  AgeEmp>65 Then N'OLD'
+									 End as AgeCatg
+from Employees
+
+---Link Server
+Select *
+From Openquery([172.20.10.35],'Select * from Pwkara.dbo.Anavin')
+
+select *
+from Northwind.dbo.Employees 
+
+select *
+From Openquery([172.20.10.35],'Select * From Pwkara.dbo.DailyWork')
+
+
+Go
+
+---Create view
+Create view View1
+as
+select * 
+From Customers
+Where Country='Germany'
+Go
+
+Select *
+From View1
